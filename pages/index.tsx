@@ -177,16 +177,16 @@ export async function getStaticProps() {
 
   const currentPop =
     population.data.observations.transformationResults
-      .filter((t) => t.transformation === "lvl")[0]
+      .filter((t: any) => t.transformation === "lvl")[0]
       .values.slice(-1)[0] * 1000;
 
   const currentLaborForce =
     civilianLabor.data.observations.transformationResults
-      .filter((t) => t.transformation === "lvl")[0]
+      .filter((t: any) => t.transformation === "lvl")[0]
       .values.slice(-1)[0] * 1000;
 
   const unemploymentRate = unemployment.data.observations.transformationResults
-    .filter((t) => t.transformation === "lvl")[0]
+    .filter((t: any) => t.transformation === "lvl")[0]
     .values.slice(-1)[0];
 
   return {
