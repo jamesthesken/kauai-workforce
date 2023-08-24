@@ -15,7 +15,7 @@ import {
 import { Doughnut, Line } from "react-chartjs-2";
 import Table from "@/components/Table";
 
-import { Card, Title, LineChart } from "@tremor/react";
+import { Card, Title, LineChart, Subtitle } from "@tremor/react";
 
 import { testData, truckData, finalData } from "./api/data.js";
 import Dropdown from "@/components/Dropdown";
@@ -44,12 +44,6 @@ interface ChartDataEntry {
   date: string;
   [transformation: string]: number | string;
 }
-
-const stats = [
-  { name: "Resident Population", stat: "73,454" },
-  { name: "Total Civilian Labor Force", stat: "36,850" },
-  { name: "Unemployment Rate", stat: "4.4%" },
-];
 
 export const data = {
   labels: [
@@ -108,24 +102,38 @@ export const lineData = {
   ],
 };
 
-function transformData(apiData: {
-  transformationResults: TransformationResult[];
-}): ChartDataEntry[] {
+function transformData(
+  apiData: {
+    transformationResults: TransformationResult[];
+  },
+  lvlOverride?: string
+): ChartDataEntry[] {
   const transformedData: ChartDataEntry[] = [];
 
-  // Find the transformation data that provides the dates
-  const dateProvider = apiData.transformationResults.find(
-    (result) => result.transformation !== "lvl"
+  const pc1Data = apiData.transformationResults.find(
+    (result) => result.transformation === "pc1"
+  );
+  const ytdData = apiData.transformationResults.find(
+    (result) => result.transformation === "ytd"
+  );
+  const lvlData = apiData.transformationResults.find(
+    (result) => result.transformation === "lvl"
   );
 
-  if (dateProvider) {
-    for (let i = 0; i < dateProvider.dates.length; i++) {
-      const entry: ChartDataEntry = {
-        date: dateProvider.dates[i], // Include the entire date
-      };
+  if (pc1Data && ytdData && lvlData) {
+    for (let i = 0; i < pc1Data.dates.length; i++) {
+      const date = pc1Data.dates[i];
+      const entry: ChartDataEntry = { date };
 
-      for (const result of apiData.transformationResults) {
-        entry[result.transformation] = parseFloat(result.values[i]);
+      entry.pc1 = parseFloat(pc1Data.values[i]);
+      entry.ytd = parseFloat(ytdData.values[i]);
+
+      if (lvlOverride) {
+        entry[lvlOverride] = parseFloat(
+          lvlData.values[lvlData.dates.indexOf(date)]
+        );
+      } else if (!lvlOverride) {
+        entry.lvl = parseFloat(lvlData.values[lvlData.dates.indexOf(date)]);
       }
 
       transformedData.push(entry);
@@ -135,12 +143,12 @@ function transformData(apiData: {
   return transformedData;
 }
 
-function fetchUheroData(id: number) {
+function fetchUheroData(id: number, start?: string) {
   const requestHeaders: HeadersInit = new Headers();
 
   requestHeaders.set("Content-Type", "application/json");
   requestHeaders.set("Authorization", `Bearer ${process.env.UHERO_KEY}`);
-  return fetch(`/api/uhero/${id}`);
+  return fetch(`/api/uhero/${id}&${start}`);
 }
 
 export async function getStaticProps() {
@@ -198,8 +206,29 @@ export default function Home({
     queryFn: () => fetchUheroData(153621).then((res) => res.json()),
   });
 
+  const { data: visitorArrivals, isLoading: loadingVisitorStats } = useQuery({
+    queryKey: ["visitorArrivals"],
+    queryFn: () =>
+      fetchUheroData(154687, "2019-01-01").then((res) => res.json()),
+  });
+
+  const { data: dailyRoomRate, isLoading: loadingRoomRate } = useQuery({
+    queryKey: ["dailyRoomRate"],
+    queryFn: () => fetchUheroData(146809).then((res) => res.json()),
+  });
+
   const dataFormatter = (number: number) =>
     `${Intl.NumberFormat("us").format(number).toString()}%`;
+
+  const formatVisitorData = (number: number) =>
+    `${Intl.NumberFormat("us")
+      .format(number * 1000)
+      .toLocaleString()}`;
+
+  const formatRateData = (number: number) =>
+    `$${Intl.NumberFormat("us").format(number).toString()}`;
+
+  console.log(unemploymentData);
 
   return (
     <>
@@ -217,9 +246,9 @@ export default function Home({
           px-6 mx-auto mt-10 md:flex-row"
           >
             {/* Left Item */}
-            <div className="flex flex-col space-y-12 md:w/2 items-center md:items-start">
+            <div className="flex flex-col space-y-12 items-center md:items-start">
               <h1 className="text-4xl text-gray-100 font-bold text-center md:text-5xl md:text-left">
-                Kauai Workforce Data Dashboard
+                Kauai County Data Dashboard
               </h1>
               <p className="max-w-sm text-center text-gray-300 md:text-left">
                 Welcome! This site displays workforce statistics for the County
@@ -275,17 +304,104 @@ export default function Home({
             <div className="mt-20 grid grid-cols-1 items-end  gap-5 sm:grid-cols-3">
               <div className="sm:col-span-3">
                 <Card>
-                  <Title>Kauai County Unemployment Rate (Monthly)</Title>
-                  {unemploymentData && (
+                  <Title>Unemployment Rate (Monthly)</Title>
+                  <Subtitle>
+                    Source: {unemploymentData?.data.series.sourceDescription}
+                  </Subtitle>
+                  {isLoading ? (
+                    <>
+                      <p className="text-sm text-gray-300">Loading data...</p>
+                      <div
+                        className="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite] text-gray-300"
+                        role="status"
+                        id="spinner"
+                      ></div>
+                    </>
+                  ) : (
                     <LineChart
                       title="Kauai County Unemployment Rate (Monthly)"
                       showAnimation={false}
                       className="mt-6"
-                      data={transformData(unemploymentData?.data.observations)}
+                      data={transformData(
+                        unemploymentData?.data.observations,
+                        "% Unemployed"
+                      )}
                       valueFormatter={dataFormatter}
                       index="date"
-                      categories={["lvl"]}
+                      categories={["% Unemployed"]}
                       colors={["emerald", "gray"]}
+                      yAxisWidth={40}
+                    />
+                  )}
+                </Card>
+              </div>
+            </div>
+            <div className="border border-gray-600 mt-20 w-full"></div>
+            <div className="mt-20 grid grid-cols-1 items-end  gap-5 sm:grid-cols-3">
+              <div className="sm:col-span-3">
+                <Card>
+                  <Title>Total Visitor Arrivals (Monthly)</Title>
+                  <Subtitle>
+                    Source: {visitorArrivals?.data.series.sourceDescription}
+                  </Subtitle>
+
+                  {loadingVisitorStats ? (
+                    <>
+                      <p className="text-sm text-gray-300">Loading data...</p>
+                      <div
+                        className="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite] text-gray-300"
+                        role="status"
+                        id="spinner"
+                      ></div>
+                    </>
+                  ) : (
+                    <LineChart
+                      title="Total Visitor Arrivals (Monthly)"
+                      showAnimation={false}
+                      className="mt-6"
+                      data={transformData(
+                        visitorArrivals?.data.observations,
+                        "Total Visitor Arrivals"
+                      )}
+                      valueFormatter={formatVisitorData}
+                      index="date"
+                      categories={["Total Visitor Arrivals"]}
+                      colors={["orange", "gray"]}
+                      yAxisWidth={40}
+                    />
+                  )}
+                </Card>
+              </div>
+            </div>
+            <div className="mt-20 grid grid-cols-1 items-end  gap-5 sm:grid-cols-3">
+              <div className="sm:col-span-3">
+                <Card>
+                  <Title>Average Daily Hotel Room Rate (Quarterly)</Title>
+                  <Subtitle>
+                    Source: {dailyRoomRate?.data.series.sourceDescription}
+                  </Subtitle>
+                  {loadingRoomRate ? (
+                    <>
+                      <p className="text-sm text-gray-300">Loading data...</p>
+                      <div
+                        className="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite] text-gray-300"
+                        role="status"
+                        id="spinner"
+                      ></div>
+                    </>
+                  ) : (
+                    <LineChart
+                      title="Average Daily Hotel Room Rate ($)"
+                      showAnimation={false}
+                      className="mt-6"
+                      data={transformData(
+                        dailyRoomRate?.data.observations,
+                        "Avg. Daily Room Rate ($)"
+                      )}
+                      valueFormatter={formatRateData}
+                      index="date"
+                      categories={["Avg. Daily Room Rate ($)"]}
+                      colors={["violet"]}
                       yAxisWidth={40}
                     />
                   )}

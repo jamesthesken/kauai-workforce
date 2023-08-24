@@ -14,10 +14,10 @@ export default async function handler(
   requestHeaders.set("Content-Type", "application/json");
   requestHeaders.set("Authorization", `Bearer ${process.env.UHERO_KEY}`);
 
-  const { id } = req.query;
+  const { id, start } = req.query;
 
   const data = await fetch(
-    `https://api.uhero.hawaii.edu/v1/package/series?u=uhero&id=${id}`,
+    `http://api.uhero.hawaii.edu/v1/package/series?u=uhero&id=${id}&fc=&start=${start}`,
     { headers: requestHeaders }
   );
 
