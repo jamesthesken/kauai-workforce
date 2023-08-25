@@ -9,16 +9,16 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const requestHeaders: HeadersInit = new Headers();
+  // const requestHeaders: HeadersInit = new Headers();
 
-  requestHeaders.set("Content-Type", "application/json");
-  requestHeaders.set("Authorization", `Bearer ${process.env.UHERO_KEY}`);
+  // requestHeaders.set("Content-Type", "application/json");
+  // requestHeaders.set("Authorization", `Bearer ${process.env.UHERO_KEY}`);
 
   const { id, start } = req.query;
   try {
     const data = await fetch(
       `http://api.uhero.hawaii.edu/v1/package/series?u=uhero&id=${id}`,
-      { headers: requestHeaders }
+      { headers: { Authorization: `Bearer ${process.env.UHERO_KEY}` } }
     );
 
     if (!data.ok) {
