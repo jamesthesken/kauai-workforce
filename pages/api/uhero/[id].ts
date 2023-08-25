@@ -27,9 +27,16 @@ export default async function handler(
 
     const jsonData = await data.json();
     res.status(200).json(jsonData);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "An error occurred while processing the request." });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "An error occurred while processing the request.",
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({
+        message: "An unknown error occurred while processing the request.",
+      });
+    }
   }
 }
