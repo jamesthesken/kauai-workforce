@@ -228,8 +228,6 @@ export default function Home({
   const formatRateData = (number: number) =>
     `$${Intl.NumberFormat("us").format(number).toString()}`;
 
-  console.log(unemploymentData);
-
   return (
     <>
       <Head>
@@ -306,7 +304,7 @@ export default function Home({
                 <Card>
                   <Title>Unemployment Rate (Monthly)</Title>
                   <Subtitle>
-                    Source: {unemploymentData?.data.series.sourceDescription}
+                    Source: {unemploymentData?.data?.series?.sourceDescription}
                   </Subtitle>
                   {isLoading ? (
                     <>
@@ -342,7 +340,7 @@ export default function Home({
                 <Card>
                   <Title>Total Visitor Arrivals (Monthly)</Title>
                   <Subtitle>
-                    Source: {visitorArrivals?.data.series.sourceDescription}
+                    Source: {visitorArrivals?.data?.series?.sourceDescription}
                   </Subtitle>
 
                   {loadingVisitorStats ? (
@@ -378,7 +376,7 @@ export default function Home({
                 <Card>
                   <Title>Average Daily Hotel Room Rate (Quarterly)</Title>
                   <Subtitle>
-                    Source: {dailyRoomRate?.data.series.sourceDescription}
+                    Source: {dailyRoomRate?.data?.series?.sourceDescription}
                   </Subtitle>
                   {loadingRoomRate ? (
                     <>
