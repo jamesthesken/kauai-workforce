@@ -17,7 +17,7 @@ export default async function handler(
   const { id, start } = req.query;
 
   const data = await fetch(
-    `http://api.uhero.hawaii.edu/v1/package/series?u=uhero&id=${id}&fc=&start=${start}`,
+    `http://api.uhero.hawaii.edu/v1/package/series?u=uhero&id=${id}`,
     { headers: requestHeaders }
   );
 
