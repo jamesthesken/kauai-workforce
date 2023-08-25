@@ -424,7 +424,7 @@ export default function Home({
                       showAnimation={false}
                       className="mt-6"
                       data={transformData(
-                        unemploymentData?.data.observations,
+                        unemploymentData?.data?.observations,
                         "% Unemployed"
                       )}
                       valueFormatter={dataFormatter}
@@ -461,7 +461,7 @@ export default function Home({
                       showAnimation={false}
                       className="mt-6"
                       data={transformData(
-                        visitorArrivals?.data.observations,
+                        visitorArrivals?.data?.observations,
                         "Total Visitor Arrivals"
                       )}
                       valueFormatter={formatVisitorData}
@@ -496,7 +496,7 @@ export default function Home({
                       showAnimation={false}
                       className="mt-6"
                       data={transformData(
-                        dailyRoomRate?.data.observations,
+                        dailyRoomRate?.data?.observations,
                         "Avg. Daily Room Rate ($)"
                       )}
                       valueFormatter={formatRateData}
