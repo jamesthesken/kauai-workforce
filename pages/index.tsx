@@ -151,10 +151,6 @@ function transformData(
 }
 
 function fetchUheroData(id: number, start?: string) {
-  const requestHeaders: HeadersInit = new Headers();
-
-  requestHeaders.set("Content-Type", "application/json");
-  requestHeaders.set("Authorization", `Bearer ${process.env.UHERO_KEY}`);
   return fetch(`/api/uhero/${id}&${start}`);
 }
 
