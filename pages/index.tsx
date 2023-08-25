@@ -117,13 +117,13 @@ function transformData(
 ): ChartDataEntry[] {
   const transformedData: ChartDataEntry[] = [];
 
-  const pc1Data = apiData.transformationResults.find(
+  const pc1Data = apiData?.transformationResults.find(
     (result) => result.transformation === "pc1"
   );
-  const ytdData = apiData.transformationResults.find(
+  const ytdData = apiData?.transformationResults.find(
     (result) => result.transformation === "ytd"
   );
-  const lvlData = apiData.transformationResults.find(
+  const lvlData = apiData?.transformationResults.find(
     (result) => result.transformation === "lvl"
   );
 
@@ -420,7 +420,7 @@ export default function Home({
                       showAnimation={false}
                       className="mt-6"
                       data={transformData(
-                        unemploymentData?.data.observations,
+                        unemploymentData?.data?.observations,
                         "% Unemployed"
                       )}
                       valueFormatter={dataFormatter}
@@ -457,7 +457,7 @@ export default function Home({
                       showAnimation={false}
                       className="mt-6"
                       data={transformData(
-                        visitorArrivals?.data.observations,
+                        visitorArrivals?.data?.observations,
                         "Total Visitor Arrivals"
                       )}
                       valueFormatter={formatVisitorData}
@@ -492,7 +492,7 @@ export default function Home({
                       showAnimation={false}
                       className="mt-6"
                       data={transformData(
-                        dailyRoomRate?.data.observations,
+                        dailyRoomRate?.data?.observations,
                         "Avg. Daily Room Rate ($)"
                       )}
                       valueFormatter={formatRateData}
