@@ -354,6 +354,10 @@ export default function Home({
               <div className="sm:col-span-1 h-full">
                 <Card className="max-w-lg">
                   <Title>Jobs by Industry</Title>
+                  <Subtitle>
+                    Source: Hawaii Workforce Informer, Hawaii Dept. of Labor and
+                    Industrial Relations
+                  </Subtitle>
                   <DonutChart
                     className="mt-6"
                     variant="pie"
