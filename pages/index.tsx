@@ -15,7 +15,14 @@ import {
 import { Doughnut, Line } from "react-chartjs-2";
 import Table from "@/components/Table";
 
-import { Card, Title, LineChart, Subtitle } from "@tremor/react";
+import {
+  Card,
+  Title,
+  LineChart,
+  Subtitle,
+  DonutChart,
+  Legend as TremorLegend,
+} from "@tremor/react";
 
 import { testData, truckData, finalData } from "./api/data.js";
 import Dropdown from "@/components/Dropdown";
@@ -151,6 +158,44 @@ function fetchUheroData(id: number, start?: string) {
   return fetch(`/api/uhero/${id}&${start}`);
 }
 
+async function jobsByIndustry() {
+  const requestHeaders: HeadersInit = new Headers();
+
+  requestHeaders.set("Content-Type", "application/json");
+  requestHeaders.set("Authorization", `Bearer ${process.env.UHERO_KEY}`);
+
+  const categoryData = [
+    { name: "Construction", url: `${process.env.API_URL}&id=159410` },
+    { name: "Retail", url: `${process.env.API_URL}&id=159472` },
+    { name: "Transportation", url: `${process.env.API_URL}&id=150350` },
+    { name: "Food Services", url: `${process.env.API_URL}&id=159738` },
+    { name: "Accommodation", url: `${process.env.API_URL}&id=159732` },
+    { name: "Government", url: `${process.env.API_URL}&id=159430` },
+    { name: "Healthcare", url: `${process.env.API_URL}&id=159433` },
+    { name: "Arts and Entertainment", url: `${process.env.API_URL}&id=159405` },
+  ];
+
+  const responses = await Promise.all(
+    categoryData.map((category) =>
+      fetch(category.url, { headers: requestHeaders }).then((res) => res.json())
+    )
+  );
+
+  const transformedData = responses.map((res, index) => {
+    const lvlData =
+      res.data.observations.transformationResults
+        .filter((t: any) => t.transformation === "lvl")[0]
+        .values.slice(-1)[0] * 1000;
+
+    return {
+      category: categoryData[index].name,
+      lvlData: lvlData,
+    };
+  });
+
+  return transformedData;
+}
+
 export async function getStaticProps() {
   const requestHeaders: HeadersInit = new Headers();
 
@@ -189,8 +234,10 @@ export async function getStaticProps() {
     .filter((t: any) => t.transformation === "lvl")[0]
     .values.slice(-1)[0];
 
+  const laborPieChart = await jobsByIndustry();
+
   return {
-    props: { currentPop, currentLaborForce, unemploymentRate },
+    props: { currentPop, currentLaborForce, unemploymentRate, laborPieChart },
   };
 }
 
@@ -198,6 +245,7 @@ export default function Home({
   currentPop,
   currentLaborForce,
   unemploymentRate,
+  laborPieChart,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [industry, setIndustry] = useState<keyof typeof finalData>("trucking");
 
@@ -227,6 +275,9 @@ export default function Home({
 
   const formatRateData = (number: number) =>
     `$${Intl.NumberFormat("us").format(number).toString()}`;
+
+  const formatJobData = (number: number) =>
+    `${Intl.NumberFormat("us").format(number).toString()}`;
 
   return (
     <>
@@ -300,7 +351,55 @@ export default function Home({
               </dl>
             </div>
             <div className="mt-20 grid grid-cols-1 items-end  gap-5 sm:grid-cols-3">
-              <div className="sm:col-span-3">
+              <div className="sm:col-span-1 h-full">
+                <Card className="max-w-lg">
+                  <Title>Jobs by Industry</Title>
+                  <DonutChart
+                    className="mt-6"
+                    variant="pie"
+                    data={laborPieChart}
+                    valueFormatter={formatJobData}
+                    category="lvlData"
+                    index="category"
+                    colors={[
+                      "slate",
+                      "violet",
+                      "indigo",
+                      "rose",
+                      "cyan",
+                      "amber",
+                      "emerald",
+                      "orange",
+                      "sky",
+                    ]}
+                  />
+                  <TremorLegend
+                    className="mt-3"
+                    categories={[
+                      "Construction",
+                      "Retail",
+                      "Transportation",
+                      "Food Services",
+                      "Accommodation",
+                      "Government",
+                      "Healthcare",
+                      "Arts and Entertainment",
+                    ]}
+                    colors={[
+                      "slate",
+                      "violet",
+                      "indigo",
+                      "rose",
+                      "cyan",
+                      "amber",
+                      "emerald",
+                      "orange",
+                      "sky",
+                    ]}
+                  />
+                </Card>
+              </div>
+              <div className="sm:col-span-2">
                 <Card>
                   <Title>Unemployment Rate (Monthly)</Title>
                   <Subtitle>
