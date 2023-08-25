@@ -151,7 +151,7 @@ function transformData(
 }
 
 function fetchUheroData(id: number, start?: string) {
-  return fetch(`/api/uhero/${id}&${start}`);
+  return fetch(`/api/uhero/${id}`);
 }
 
 async function jobsByIndustry() {
@@ -252,8 +252,7 @@ export default function Home({
 
   const { data: visitorArrivals, isLoading: loadingVisitorStats } = useQuery({
     queryKey: ["visitorArrivals"],
-    queryFn: () =>
-      fetchUheroData(154687, "2019-01-01").then((res) => res.json()),
+    queryFn: () => fetchUheroData(154687).then((res) => res.json()),
   });
 
   const { data: dailyRoomRate, isLoading: loadingRoomRate } = useQuery({
