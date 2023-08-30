@@ -51,7 +51,7 @@ export default function Table() {
     <div className="sm:px-6">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-xl font-semibold text-gray-50">
+          <h1 className="text-xl font-semibold dark:text-gray-50 text-gray-900 ">
             Industry Data - Q3 2021
           </h1>
           <p className="mt-2 text-sm text-gray-500">

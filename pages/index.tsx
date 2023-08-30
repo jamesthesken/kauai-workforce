@@ -14,6 +14,7 @@ import {
 } from "chart.js";
 import { Doughnut, Line } from "react-chartjs-2";
 import Table from "@/components/Table";
+import { useTheme } from "next-themes";
 
 import {
   Card,
@@ -29,6 +30,7 @@ import Dropdown from "@/components/Dropdown";
 import Contact from "../components/Contact";
 import { InferGetStaticPropsType } from "next";
 import { useQuery } from "@tanstack/react-query";
+import { ArrowUpRightIcon } from "@heroicons/react/24/outline";
 
 ChartJS.register(
   ArcElement,
@@ -282,7 +284,7 @@ export default function Home({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800 min-h-screen">
+      <div className="dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 bg-gray-100 min-h-screen">
         <NavBar />
         <section id="hero">
           <div
@@ -291,16 +293,16 @@ export default function Home({
           >
             {/* Left Item */}
             <div className="flex flex-col space-y-12 items-center md:items-start">
-              <h1 className="text-4xl text-gray-100 font-bold text-center md:text-5xl md:text-left">
+              <h1 className="text-4xl dark:text-gray-100 text-gray-800 font-bold text-center md:text-5xl md:text-left">
                 Kauai County Data Dashboard
               </h1>
-              <p className="max-w-sm text-center text-gray-300 md:text-left">
+              <p className="max-w-sm text-center dark:text-gray-300 text-gray-600 md:text-left">
                 Welcome! This site displays workforce statistics for the County
                 of Kauai. Data is collected from the Bureau of Labor Statistics
                 and the State of Hawaii. If you are interested in more data or
                 visualizations, please contact us.
               </p>
-              <div className="border border-gray-600 w-full"></div>
+              <div className="border dark:border-gray-600 border-gray-200 w-full"></div>
             </div>
             {/* Right Item */}
           </div>
@@ -308,38 +310,43 @@ export default function Home({
         <section id="dashboard">
           <div className="container items-center px-6 mx-auto mt-10 ">
             <div>
-              <h3 className="text-lg font-medium leading-6 text-gray-300">
+              <h3 className="text-lg font-medium leading-6 dark:text-gray-300 text-gray-700">
                 Quick facts
               </h3>
-              <a
-                href="https://dbedt.hawaii.gov/economic/datawarehouse/"
-                className="text-sm font-medium leading-6 text-gray-500"
-              >
-                Source: U.S. Bureau of Labor Statistics and Hawaii State Dep. of
-                Business, Economic Development <span>&#38;</span> Tourism
-              </a>
+              <div className="flex align-middle">
+                <a
+                  href="https://dbedt.hawaii.gov/economic/datawarehouse/"
+                  className="text-sm font-medium leading-6 text-gray-500 hover:underline hover:underline-offset-4 align-middle pr-2"
+                >
+                  Source: U.S. Bureau of Labor Statistics and Hawaii State Dep.
+                  of Business, Economic Development <span>&#38;</span> Tourism{" "}
+                </a>
+                <span>
+                  <ArrowUpRightIcon className="w-4 h-4" />
+                </span>
+              </div>
               <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
-                <div className="overflow-hidden rounded-lg bg-gray-800 px-4 py-5 shadow sm:p-6">
-                  <dt className="truncate text-sm font-medium text-gray-400">
+                <div className="overflow-hidden rounded-lg dark:bg-gray-800 bg-white px-4 py-5 shadow sm:p-6">
+                  <dt className="truncate text-sm font-medium dark:text-gray-400 text-gray-500">
                     Resident Population
                   </dt>
-                  <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-100">
+                  <dd className="mt-1 text-3xl font-semibold tracking-tight dark:text-gray-100 text-gray-800">
                     {currentPop.toLocaleString()}
                   </dd>
                 </div>
-                <div className="overflow-hidden rounded-lg bg-gray-800 px-4 py-5 shadow sm:p-6">
-                  <dt className="truncate text-sm font-medium text-gray-400">
+                <div className="overflow-hidden rounded-lg dark:bg-gray-800 bg-white  px-4 py-5 shadow sm:p-6">
+                  <dt className="truncate text-sm font-medium dark:text-gray-400 text-gray-500">
                     Total Employed
                   </dt>
-                  <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-100">
+                  <dd className="mt-1 text-3xl font-semibold tracking-tight dark:text-gray-100 text-gray-800">
                     {currentLaborForce.toLocaleString()}
                   </dd>
                 </div>
-                <div className="overflow-hidden rounded-lg bg-gray-800 px-4 py-5 shadow sm:p-6">
-                  <dt className="truncate text-sm font-medium text-gray-400">
+                <div className="overflow-hidden rounded-lg dark:bg-gray-800 bg-white px-4 py-5 shadow sm:p-6">
+                  <dt className="truncate text-sm font-medium dark:text-gray-400 text-gray-500">
                     Unemployment Rate
                   </dt>
-                  <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-100">
+                  <dd className="mt-1 text-3xl font-semibold tracking-tight dark:text-gray-100 text-gray-800">
                     {unemploymentRate} %
                   </dd>
                 </div>
@@ -432,7 +439,7 @@ export default function Home({
                 </Card>
               </div>
             </div>
-            <div className="border border-gray-600 mt-20 w-full"></div>
+            <div className="border dark:border-gray-600 border-gray-200 mt-20 w-full"></div>
             <div className="mt-20 grid grid-cols-1 items-end  gap-5 sm:grid-cols-3">
               <div className="sm:col-span-3">
                 <Card>
@@ -504,10 +511,10 @@ export default function Home({
                 </Card>
               </div>
             </div>
-            <div className="border border-gray-600 mt-20 w-full"></div>
+            <div className="border dark:border-gray-600 border-gray-200 mt-20 w-full"></div>
             <div className="mt-20 grid grid-cols-1 gap-5 items-end md:grid-cols-3">
               <div className="md:col-span-1">
-                <h1 className="text-2xl pb-5 text-gray-100 font-bold text-center md:text-3xl md:text-left">
+                <h1 className="text-2xl pb-5 dark:text-gray-100 text-gray-800 font-bold text-center md:text-3xl md:text-left">
                   Wages by Industry
                 </h1>
                 <div className="border-gray-200 h-96 rounded-lg  px-4 py-5 bg-gray-800 sm:px-6">
