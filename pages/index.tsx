@@ -512,7 +512,7 @@ export default function Home({
               </div>
             </div>
             <div className="border dark:border-gray-600 border-gray-200 mt-20 w-full"></div>
-            <div className="mt-20 grid grid-cols-1 gap-5 items-end md:grid-cols-3">
+            {/* <div className="mt-20 grid grid-cols-1 gap-5 items-end md:grid-cols-3">
               <div className="md:col-span-1">
                 <h1 className="text-2xl pb-5 dark:text-gray-100 text-gray-800 font-bold text-center md:text-3xl md:text-left">
                   Wages by Industry
@@ -565,7 +565,7 @@ export default function Home({
             </div>
             <div className="mt-20 pb-20 grid grid-cols-1 gap-5">
               <Table />
-            </div>
+            </div> */}
           </div>
         </section>
         <section id="contact">
