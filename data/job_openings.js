@@ -5,30 +5,35 @@ export const certificationData = [
       "American Heart Association (AHA) CPR & First Aid Certifications",
     "Advertised Certification Sub-Category": "Nursing",
     "Job Opening Match Count": 191,
+    "Color Code": "red", // Red
   },
   {
     Rank: 2,
     "Advertised Certification Group": "Nursing Credentials and Certifications",
     "Advertised Certification Sub-Category": "Nursing",
     "Job Opening Match Count": 105,
+    "Color Code": "red", // Red
   },
   {
     Rank: 3,
     "Advertised Certification Group": "Commercial Drivers License (CDL)",
     "Advertised Certification Sub-Category": "Ground Transportation",
     "Job Opening Match Count": 57,
+    "Color Code": "green", // Green
   },
   {
     Rank: 4,
     "Advertised Certification Group": "Microsoft Certifications",
     "Advertised Certification Sub-Category": "Computer Systems",
     "Job Opening Match Count": 30,
+    "Color Code": "blue", // Blue
   },
   {
     Rank: 5,
     "Advertised Certification Group": "Red Hat Certifications",
     "Advertised Certification Sub-Category": "Software",
     "Job Opening Match Count": 30,
+    "Color Code": "yellow", // Yellow
   },
   {
     Rank: 6,
@@ -36,6 +41,7 @@ export const certificationData = [
       "Association for Materials Protection and Performance (AMPP) - Craftworker and Coating Certifications",
     "Advertised Certification Sub-Category": "Safety and Quality",
     "Job Opening Match Count": 26,
+    "Color Code": "magenta", // Magenta
   },
   {
     Rank: 7,
@@ -43,12 +49,14 @@ export const certificationData = [
       "Behavior Analyst Certification Board (BACB)",
     "Advertised Certification Sub-Category": "Counseling",
     "Job Opening Match Count": 16,
+    "Color Code": "cyan", // Cyan
   },
   {
     Rank: 8,
     "Advertised Certification Group": "Cisco Certifications",
     "Advertised Certification Sub-Category": "Computer Network",
     "Job Opening Match Count": 14,
+    "Color Code": "purple", // Purple
   },
   {
     Rank: 9,
@@ -56,6 +64,7 @@ export const certificationData = [
       "American Medical Technologists (AMT) Certifications",
     "Advertised Certification Sub-Category": "Medical Professional",
     "Job Opening Match Count": 11,
+    "Color Code": "green", // Dark Green
   },
   {
     Rank: 10,
@@ -63,6 +72,7 @@ export const certificationData = [
       "American Red Cross - First Aid Certifications",
     "Advertised Certification Sub-Category": "Nursing",
     "Job Opening Match Count": 8,
+    "Color Code": "red", // Red
   },
 ];
 
