@@ -31,7 +31,7 @@ export default function NavBar() {
   }
 
   return (
-    <Disclosure as="nav" className="dark:bg-gray-900 bg-gray-100">
+    <Disclosure as="nav" className="">
       {({ open }) => (
         <>
           <div className="relative container mx-auto py-6 px-6">
@@ -81,7 +81,7 @@ export default function NavBar() {
             </div>
           </div>
 
-          <Disclosure.Panel className="sm:hidden">
+          <Disclosure.Panel className="sm:hidden dark:bg-gray-900 bg-gray-100">
             <div className="space-y-1 px-2 pt-2 pb-3">
               {navigation.map((item) => (
                 <Disclosure.Button

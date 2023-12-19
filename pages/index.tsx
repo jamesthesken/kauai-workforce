@@ -270,6 +270,29 @@ export async function getStaticProps() {
     (unemploymentRate - previousUnemploymentRate).toFixed(2)
   );
 
+  // calculate labor force delta from previous month
+  const previousLaborForce =
+    civilianLabor.data.observations.transformationResults
+      .filter((t: any) => t.transformation === "lvl")[0]
+      .values.slice(-2)[0] * 1000;
+
+  const laborForceDelta = Number(
+    (
+      ((currentLaborForce - previousLaborForce) / previousLaborForce) *
+      100
+    ).toFixed(2)
+  );
+
+  // calculate population delta from previous month
+  const previousPop =
+    population.data.observations.transformationResults
+      .filter((t: any) => t.transformation === "lvl")[0]
+      .values.slice(-2)[0] * 1000;
+
+  console.log(previousPop);
+
+  const populationDelta = Number((currentPop - previousPop).toFixed(2));
+
   const unemploymentRateDate = unemployment.data.observations.observationEnd;
 
   const laborPieChart = await jobsByIndustry();
@@ -281,8 +304,10 @@ export async function getStaticProps() {
       currentPopObservationDate,
       currentPop,
       currentLaborForce,
+      laborForceDelta,
       unemploymentRate,
       unemploymentRateDelta,
+      populationDelta,
       laborPieChart,
     },
   };
@@ -296,6 +321,8 @@ export default function Home({
   currentLaborForce,
   unemploymentRate,
   unemploymentRateDelta,
+  populationDelta,
+  laborForceDelta,
   laborPieChart,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [industry, setIndustry] = useState<keyof typeof finalData>("trucking");
@@ -453,23 +480,49 @@ export default function Home({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 bg-gray-100 min-h-screen">
-        <NavBar />
+        <div className="absolute inset-x-0 top-0 z-50">
+          {" "}
+          <NavBar />
+        </div>
+
         <section id="hero">
-          <div
-            className="container flex flex-col-reverse items-center
-          px-6 mx-auto mt-10 md:flex-row"
-          >
-            <div className="flex flex-col space-y-12 items-center md:items-start">
-              <h1 className="text-4xl dark:text-gray-100 text-gray-800 font-bold text-center md:text-5xl md:text-left">
-                Kauai Workforce Data Dashboard
-              </h1>
-              <p className="max-w-md text-center dark:text-gray-300 text-gray-600 md:text-left">
-                Welcome! This site displays workforce statistics for the County
-                of Kauai. Data is collected from the Bureau of Labor Statistics
-                and the State of Hawaii. If you are interested in more data or
-                visualizations, please contact us.
-              </p>
-              <div className="border dark:border-gray-600 border-gray-200 w-full"></div>
+          <div className="relative isolate px-6 pt-14 lg:px-8">
+            <div className="mx-auto max-w-2xl pt-20">
+              <div
+                className="absolute inset-x-0 -top-80 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
+                aria-hidden="true"
+              >
+                <div
+                  className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-r from-purple-200 to-purple-500 opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+                  style={{
+                    clipPath:
+                      "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
+                  }}
+                />
+              </div>
+              <div className="text-center">
+                <h1 className="text-4xl font-bold tracking-tight dark:text-gray-100 text-gray-800 sm:text-6xl">
+                  Kauai Workforce Dashboard
+                </h1>
+                <p className="mt-6 text-lg leading-8 dark:text-gray-300 text-gray-600 ">
+                  Welcome! This site displays workforce statistics for the
+                  County of Kauai. Data is collected from the Bureau of Labor
+                  Statistics and the State of Hawaii. If you are interested in
+                  more data or visualizations, please contact us.
+                </p>
+              </div>
+            </div>
+            <div
+              className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
+              aria-hidden="true"
+            >
+              <div
+                className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-r from-purple-200 to-purple-500 opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
+                style={{
+                  clipPath:
+                    "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
+                }}
+              />
             </div>
           </div>
         </section>
@@ -494,7 +547,7 @@ export default function Home({
                 </span>
               </div>
               <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
-                <div className="overflow-hidden rounded-lg dark:bg-gray-800 bg-white px-4 py-5 shadow sm:p-6">
+                {/* <div className="overflow-hidden rounded-lg dark:bg-gray-800 bg-white px-4 py-5 shadow sm:p-6">
                   <dt className="truncate text-sm font-medium dark:text-gray-400 text-gray-500">
                     Resident Population
                   </dt>
@@ -506,32 +559,31 @@ export default function Home({
                       {formatDate(currentPopObservationDate)}
                     </span>
                   </dd>
-                </div>
-                {/* <Card className="max-w-sm">
+                </div> */}
+                <Card className="max-w-sm">
                   <Flex justifyContent="between" alignItems="center">
-                    <Text>Sales</Text>
-                    <BadgeDelta
-                      deltaType="moderateIncrease"
-                      isIncreasePositive={true}
-                      size="xs"
-                    >
-                      +12.3%
-                    </BadgeDelta>
+                    <Text>Resident Population</Text>
                   </Flex>
-                  <Metric>$ 23,456</Metric>
+                  <Metric> {currentPop.toLocaleString()}</Metric>
+                  <Flex alignItems="baseline" className="space-x-2 mt-4">
+                    <Text>{formatDate(currentPopObservationDate)}</Text>
+                  </Flex>
                 </Card>
                 <Card className="max-w-sm">
                   <Flex justifyContent="between" alignItems="center">
-                    <Text>Unemployment Rate</Text>
+                    <Text>Total Employed</Text>
                     <BadgeDelta
                       deltaType="moderateIncrease"
                       isIncreasePositive={true}
                       size="xs"
                     >
-                      +12.3%
+                      {laborForceDelta.toLocaleString()}%
                     </BadgeDelta>
                   </Flex>
-                  <Metric>$ 23,456</Metric>
+                  <Metric>{currentLaborForce.toLocaleString()}</Metric>
+                  <Flex alignItems="baseline" className="space-x-2 mt-4">
+                    <Text>{formatDate(currentLaborForceDate)}</Text>
+                  </Flex>
                 </Card>
                 <Card className="max-w-sm">
                   <Flex justifyContent="between" alignItems="center">
@@ -548,9 +600,12 @@ export default function Home({
                       {unemploymentRateDelta}%
                     </BadgeDelta>
                   </Flex>
-                  <Metric>{unemploymentRate}</Metric>
-                </Card> */}
-                <div className="overflow-hidden rounded-lg dark:bg-gray-800 bg-white  px-4 py-5 shadow sm:p-6">
+                  <Metric>{unemploymentRate}%</Metric>
+                  <Flex alignItems="baseline" className="space-x-2 mt-4">
+                    <Text>{formatDate(unemploymentRateDate)}</Text>
+                  </Flex>
+                </Card>
+                {/* <div className="overflow-hidden rounded-lg dark:bg-gray-800 bg-white  px-4 py-5 shadow sm:p-6">
                   <dt className="truncate text-sm font-medium dark:text-gray-400 text-gray-500">
                     Total Employed
                   </dt>
@@ -575,7 +630,7 @@ export default function Home({
                       {formatDate(unemploymentRateDate)}
                     </span>
                   </dd>
-                </div>
+                </div> */}
               </dl>
             </div>
             <div className="mt-20 grid grid-cols-1 items-end  gap-5 ">
@@ -699,49 +754,49 @@ export default function Home({
                       <div className="mt-8 flex flex-col">
                         <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
                           <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                              <table className="min-w-full divide-y divide-gray-800">
-                                <thead className="bg-gray-900">
+                            <div className="overflow-hidden dark:shadow dark:ring-1 dark:ring-black dark:ring-opacity-5 md:rounded-lg">
+                              <table className="min-w-full divide-y dark:divide-gray-800 divide-gray-300">
+                                <thead className="dark:bg-gray-900">
                                   <tr>
                                     <th
                                       scope="col"
-                                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-6"
+                                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold dark:text-gray-50 text-gray-900 sm:pl-6"
                                     >
                                       Area
                                     </th>
                                     <th
                                       scope="col"
-                                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-6"
+                                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold dark:text-gray-50 text-gray-900 sm:pl-6"
                                     >
                                       Occupation
                                     </th>
                                     <th
                                       scope="col"
-                                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-50"
+                                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold dark:text-gray-50 text-gray-900 sm:pl-6"
                                     >
                                       Job Openings
                                     </th>
                                     <th
                                       scope="col"
-                                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-50"
+                                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold dark:text-gray-50 text-gray-900 sm:pl-6"
                                     >
                                       New Openings
                                     </th>
                                   </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-600 bg-gray-800">
+                                <tbody className="divide-y dark:divide-gray-600 divide-gray-200">
                                   {jobsData.map((job) => (
                                     <tr key={job.id}>
-                                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-300 sm:pl-6">
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm dark:text-gray-300 text-gray-900">
                                         {job.Area}
                                       </td>
-                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm dark:text-gray-300 text-gray-900">
                                         {job.Occupation}
                                       </td>
-                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm dark:text-gray-300 text-gray-900">
                                         {job["Job Openings"]}
                                       </td>
-                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm dark:text-gray-300 text-gray-900">
                                         {job["New Job Postings"]}
                                       </td>
                                     </tr>
