@@ -540,14 +540,15 @@ export default function Home({
                                 scope="col"
                                 className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-6"
                               >
-                                Certification
+                                Type
                               </th>
                               <th
                                 scope="col"
                                 className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-6"
                               >
-                                Type
+                                Certification
                               </th>
+
                               <th
                                 scope="col"
                                 className="px-3 py-3.5 text-left text-sm font-semibold text-gray-50"
@@ -559,9 +560,6 @@ export default function Home({
                           <tbody className="divide-y divide-gray-600 bg-gray-800">
                             {certificationData.map((cert) => (
                               <tr key={cert.Rank}>
-                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-300 sm:pl-6">
-                                  {cert["Advertised Certification Group"]}
-                                </td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
                                   <span
                                     className={`inline-flex items-center rounded-md bg-${cert["Color Code"]}-400/10 px-2 py-1 text-xs font-medium text-${cert["Color Code"]}-400 ring-1 ring-inset ring-${cert["Color Code"]}-400/20`}
@@ -573,6 +571,10 @@ export default function Home({
                                     }
                                   </span>
                                 </td>
+                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-300 sm:pl-6">
+                                  {cert["Advertised Certification Group"]}
+                                </td>
+
                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
                                   {cert["Job Opening Match Count"]}
                                 </td>
