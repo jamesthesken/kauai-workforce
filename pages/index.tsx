@@ -15,7 +15,6 @@ import {
 } from "chart.js";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import Table from "@/components/Table";
-import { useTheme } from "next-themes";
 
 import {
   Card,
@@ -25,6 +24,11 @@ import {
   DonutChart,
   Legend as TremorLegend,
   BarChart,
+  TabGroup,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
 } from "@tremor/react";
 
 import { testData, truckData, finalData } from "./api/data.js";
@@ -32,6 +36,17 @@ import Contact from "../components/Contact";
 import { InferGetStaticPropsType } from "next";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRightIcon } from "@heroicons/react/24/outline";
+import { jobsData } from "../data/job_openings.js";
+
+export type JobsData = {
+  Area: string;
+  "Time Period": string;
+  Occupation: string;
+  "Occupation Code": string;
+  "Job Openings": string;
+  "New Job Postings": string;
+  null?: string[];
+}[];
 
 ChartJS.register(
   ArcElement,
@@ -357,7 +372,7 @@ export default function Home({
         borderWidth: 1,
       },
       {
-        label: "Hawaii",
+        label: "State of Hawaii",
         data: [
           875, 449, 848, 924, 543, 928, 311, 474, 43, 2, 4, 900, 899, 112, 345,
           2, 52, 2, 770, 485, 679, 2, 1,
@@ -429,7 +444,7 @@ export default function Home({
               <h1 className="text-4xl dark:text-gray-100 text-gray-800 font-bold text-center md:text-5xl md:text-left">
                 Kauai Workforce Data Dashboard
               </h1>
-              <p className="max-w-sm text-center dark:text-gray-300 text-gray-600 md:text-left">
+              <p className="max-w-md text-center dark:text-gray-300 text-gray-600 md:text-left">
                 Welcome! This site displays workforce statistics for the County
                 of Kauai. Data is collected from the Bureau of Labor Statistics
                 and the State of Hawaii. If you are interested in more data or
@@ -501,22 +516,94 @@ export default function Home({
                 </div>
               </dl>
             </div>
-            <div className="mt-20 grid grid-cols-1 items-end  gap-5 ">
-              <Card>
-                <Title>Job Openings by Industry</Title>
-                <Subtitle>
-                  <a
-                    href="https://www.hirenethawaii.com/vosnet/lmi/default.aspx?plang=E&qlink=1"
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="hover:underline underline-offset-1"
-                  >
-                    Hawaii Workforce Infonet, Oct. 2023
-                  </a>
-                </Subtitle>
-                <Bar options={options} data={jobOpenings} />
-              </Card>
-            </div>
+            <TabGroup>
+              <TabList className="mt-8">
+                <Tab>Chart</Tab>
+                <Tab>Table</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <div className="grid grid-cols-1 items-end  gap-5 ">
+                    <Card>
+                      <Title>Job Openings by Industry</Title>
+                      <Subtitle>
+                        <a
+                          href="https://www.hirenethawaii.com/vosnet/lmi/default.aspx?plang=E&qlink=1"
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="hover:underline underline-offset-1"
+                        >
+                          Hawaii Workforce Infonet, Oct. 2023
+                        </a>
+                      </Subtitle>
+                      <Bar options={options} data={jobOpenings} />
+                    </Card>
+                  </div>
+                </TabPanel>
+                <TabPanel>
+                  <div className="grid grid-cols-1 items-end  gap-5 ">
+                    <Card>
+                      <div className="mt-8 flex flex-col">
+                        <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                          <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+                            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                              <table className="min-w-full divide-y divide-gray-800">
+                                <thead className="bg-gray-900">
+                                  <tr>
+                                    <th
+                                      scope="col"
+                                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-6"
+                                    >
+                                      Area
+                                    </th>
+                                    <th
+                                      scope="col"
+                                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-6"
+                                    >
+                                      Occupation
+                                    </th>
+                                    <th
+                                      scope="col"
+                                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-50"
+                                    >
+                                      Job Openings
+                                    </th>
+                                    <th
+                                      scope="col"
+                                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-50"
+                                    >
+                                      New Openings
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-600 bg-gray-800">
+                                  {jobsData.map((job) => (
+                                    <tr key={job.id}>
+                                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-300 sm:pl-6">
+                                        {job.Area}
+                                      </td>
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
+                                        {job.Occupation}
+                                      </td>
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
+                                        {job["Job Openings"]}
+                                      </td>
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
+                                        {job["New Job Postings"]}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                </TabPanel>
+              </TabPanels>
+            </TabGroup>
             <div className="border dark:border-gray-600 border-gray-200 mt-20 w-full"></div>
             <div className="mt-20 grid grid-cols-1 items-end  gap-5 sm:grid-cols-3">
               <div className="sm:col-span-3">
@@ -555,6 +642,9 @@ export default function Home({
             </div>
             <div className="border dark:border-gray-600 border-gray-200 mt-20 w-full"></div>
             <div className="mt-20 grid grid-cols-1 items-end  gap-5 sm:grid-cols-3">
+              <h3 className="text-lg font-medium leading-6 dark:text-gray-300 text-gray-700">
+                Other cool datasets 👀
+              </h3>
               <div className="sm:col-span-3">
                 <Card>
                   <Title>Total Visitor Arrivals (Monthly)</Title>
