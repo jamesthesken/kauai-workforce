@@ -36,7 +36,7 @@ import Contact from "../components/Contact";
 import { InferGetStaticPropsType } from "next";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRightIcon } from "@heroicons/react/24/outline";
-import { jobsData } from "../data/job_openings.js";
+import { jobsData, certificationData } from "../data/job_openings.js";
 
 export type JobsData = {
   Area: string;
@@ -516,6 +516,59 @@ export default function Home({
                 </div>
               </dl>
             </div>
+            <div className="mt-20 grid grid-cols-1 items-end  gap-5 ">
+              <Card>
+                <Title>Top In-Demand Certifications (Kauai County)</Title>
+                <Subtitle>
+                  <a
+                    href="https://www.hirenethawaii.com/vosnet/lmi/default.aspx?plang=E&qlink=1"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="hover:underline underline-offset-1"
+                  >
+                    Hawaii Workforce Infonet, Oct. 2023
+                  </a>
+                </Subtitle>
+                <div className="mt-8 flex flex-col">
+                  <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                    <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+                      <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                        <table className="min-w-full divide-y divide-gray-800">
+                          <thead className="bg-gray-900">
+                            <tr>
+                              <th
+                                scope="col"
+                                className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-6"
+                              >
+                                Certification
+                              </th>
+                              <th
+                                scope="col"
+                                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-50"
+                              >
+                                Job Openings
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-600 bg-gray-800">
+                            {certificationData.map((cert) => (
+                              <tr key={cert.Rank}>
+                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-300 sm:pl-6">
+                                  {cert["Advertised Certification Group"]}
+                                </td>
+                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
+                                  {cert["Job Opening Match Count"]}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </div>
             <TabGroup>
               <TabList className="mt-8">
                 <Tab>Chart</Tab>
@@ -543,6 +596,17 @@ export default function Home({
                 <TabPanel>
                   <div className="grid grid-cols-1 items-end  gap-5 ">
                     <Card>
+                      <Title>Job Openings by Industry</Title>
+                      <Subtitle>
+                        <a
+                          href="https://www.hirenethawaii.com/vosnet/lmi/default.aspx?plang=E&qlink=1"
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="hover:underline underline-offset-1"
+                        >
+                          Hawaii Workforce Infonet, Oct. 2023
+                        </a>
+                      </Subtitle>
                       <div className="mt-8 flex flex-col">
                         <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
                           <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
