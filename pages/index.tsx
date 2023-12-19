@@ -29,6 +29,10 @@ import {
   Tab,
   TabPanels,
   TabPanel,
+  Flex,
+  Text,
+  BadgeDelta,
+  Metric,
 } from "@tremor/react";
 
 import { testData, truckData, finalData } from "./api/data.js";
@@ -37,6 +41,8 @@ import { InferGetStaticPropsType } from "next";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRightIcon } from "@heroicons/react/24/outline";
 import { jobsData, certificationData } from "../data/job_openings.js";
+import classNames from "classnames";
+import Badge from "../components/Badge";
 
 export type JobsData = {
   Area: string;
@@ -254,8 +260,17 @@ export async function getStaticProps() {
     .filter((t: any) => t.transformation === "lvl")[0]
     .values.slice(-1)[0];
 
+  // calculate unemployment rate delta from previous month
+  const previousUnemploymentRate =
+    unemployment.data.observations.transformationResults
+      .filter((t: any) => t.transformation === "lvl")[0]
+      .values.slice(-2)[0];
+
+  const unemploymentRateDelta = Number(
+    (unemploymentRate - previousUnemploymentRate).toFixed(2)
+  );
+
   const unemploymentRateDate = unemployment.data.observations.observationEnd;
-  console.log(unemploymentRateDate);
 
   const laborPieChart = await jobsByIndustry();
 
@@ -267,6 +282,7 @@ export async function getStaticProps() {
       currentPop,
       currentLaborForce,
       unemploymentRate,
+      unemploymentRateDelta,
       laborPieChart,
     },
   };
@@ -279,6 +295,7 @@ export default function Home({
   unemploymentRateDate,
   currentLaborForce,
   unemploymentRate,
+  unemploymentRateDelta,
   laborPieChart,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [industry, setIndustry] = useState<keyof typeof finalData>("trucking");
@@ -309,6 +326,8 @@ export default function Home({
     queryKey: ["uiData"],
     queryFn: () => fetchUheroData(153621).then((res) => res.json()),
   });
+
+  console.log(unemploymentData);
 
   const { data: visitorArrivals, isLoading: loadingVisitorStats } = useQuery({
     queryKey: ["visitorArrivals"],
@@ -484,10 +503,53 @@ export default function Home({
                   </dd>
                   <dd>
                     <span className="text-xs text-gray-500">
-                      As of {formatDate(currentPopObservationDate)}
+                      {formatDate(currentPopObservationDate)}
                     </span>
                   </dd>
                 </div>
+                {/* <Card className="max-w-sm">
+                  <Flex justifyContent="between" alignItems="center">
+                    <Text>Sales</Text>
+                    <BadgeDelta
+                      deltaType="moderateIncrease"
+                      isIncreasePositive={true}
+                      size="xs"
+                    >
+                      +12.3%
+                    </BadgeDelta>
+                  </Flex>
+                  <Metric>$ 23,456</Metric>
+                </Card>
+                <Card className="max-w-sm">
+                  <Flex justifyContent="between" alignItems="center">
+                    <Text>Unemployment Rate</Text>
+                    <BadgeDelta
+                      deltaType="moderateIncrease"
+                      isIncreasePositive={true}
+                      size="xs"
+                    >
+                      +12.3%
+                    </BadgeDelta>
+                  </Flex>
+                  <Metric>$ 23,456</Metric>
+                </Card>
+                <Card className="max-w-sm">
+                  <Flex justifyContent="between" alignItems="center">
+                    <Text>Unemployment Rate</Text>
+                    <BadgeDelta
+                      deltaType={
+                        unemploymentRateDelta > 0
+                          ? "moderateIncrease"
+                          : "moderateDecrease"
+                      }
+                      isIncreasePositive={false}
+                      size="xs"
+                    >
+                      {unemploymentRateDelta}%
+                    </BadgeDelta>
+                  </Flex>
+                  <Metric>{unemploymentRate}</Metric>
+                </Card> */}
                 <div className="overflow-hidden rounded-lg dark:bg-gray-800 bg-white  px-4 py-5 shadow sm:p-6">
                   <dt className="truncate text-sm font-medium dark:text-gray-400 text-gray-500">
                     Total Employed
@@ -497,7 +559,7 @@ export default function Home({
                   </dd>
                   <dd>
                     <span className="text-xs text-gray-500">
-                      As of {formatDate(currentLaborForceDate)}
+                      {formatDate(currentLaborForceDate)}
                     </span>
                   </dd>
                 </div>
@@ -510,7 +572,7 @@ export default function Home({
                   </dd>
                   <dd>
                     <span className="text-xs text-gray-500">
-                      As of {formatDate(unemploymentRateDate)}
+                      {formatDate(unemploymentRateDate)}
                     </span>
                   </dd>
                 </div>
@@ -532,50 +594,58 @@ export default function Home({
                 <div className="mt-8 flex flex-col">
                   <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                      <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                        <table className="min-w-full divide-y divide-gray-800">
-                          <thead className="bg-gray-900">
+                      <div className="overflow-hidden dark:shadow dark:ring-1 dark:ring-black dark:ring-opacity-5 md:rounded-lg">
+                        <table className="min-w-full divide-y dark:divide-gray-800 divide-gray-300">
+                          <thead className="dark:bg-gray-900">
                             <tr>
                               <th
                                 scope="col"
-                                className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-6"
+                                className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold dark:text-gray-50 text-gray-900 sm:pl-6"
                               >
                                 Type
                               </th>
                               <th
                                 scope="col"
-                                className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-6"
+                                className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold dark:text-gray-50 text-gray-900 sm:pl-6"
                               >
                                 Certification
                               </th>
 
                               <th
                                 scope="col"
-                                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-50"
+                                className="px-3 py-3.5 text-left text-sm font-semibold dark:text-gray-50 text-gray-900"
                               >
                                 Job Openings
                               </th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-gray-600 bg-gray-800">
+                          <tbody className="divide-y dark:divide-gray-600 divide-gray-200">
                             {certificationData.map((cert) => (
                               <tr key={cert.Rank}>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
-                                  <span
-                                    className={`inline-flex items-center rounded-md bg-${cert["Color Code"]}-400/10 px-2 py-1 text-xs font-medium text-${cert["Color Code"]}-400 ring-1 ring-inset ring-${cert["Color Code"]}-400/20`}
+                                <td className="whitespace-nowrap px-3 py-4 text-sm dark:text-gray-300 text-gray-900">
+                                  {/* <span
+                                    className={classNames( `inline-flex items-center rounded-md bg-$-400/10 px-2 py-1 text-xs font-medium text-${cert["Color Code"]}-400 ring-1 ring-inset ring-${cert["Color Code"]}-400/20`)}
                                   >
                                     {
                                       cert[
                                         "Advertised Certification Sub-Category"
                                       ]
                                     }
-                                  </span>
+                                  </span> */}
+                                  <Badge
+                                    text={
+                                      cert[
+                                        "Advertised Certification Sub-Category"
+                                      ]
+                                    }
+                                    color={cert["Color Code"]}
+                                  />
                                 </td>
-                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-300 sm:pl-6">
+                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium dark:text-gray-300 text-gray-900 sm:pl-6">
                                   {cert["Advertised Certification Group"]}
                                 </td>
 
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
+                                <td className="whitespace-nowrap px-3 py-4 text-sm dark:text-gray-300 text-gray-900">
                                   {cert["Job Opening Match Count"]}
                                 </td>
                               </tr>
@@ -768,7 +838,7 @@ export default function Home({
                 <Card>
                   <Title>Average Daily Hotel Room Rate (Quarterly)</Title>
                   <Subtitle>
-                    Source: {dailyRoomRate?.data?.series?.sourceDescription}
+                    {dailyRoomRate?.data?.series?.sourceDescription}
                   </Subtitle>
                   {loadingRoomRate ? (
                     <>
