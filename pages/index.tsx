@@ -11,8 +11,9 @@ import {
   PointElement,
   LineElement,
   Colors,
+  BarElement,
 } from "chart.js";
-import { Doughnut, Line } from "react-chartjs-2";
+import { Bar, Doughnut, Line } from "react-chartjs-2";
 import Table from "@/components/Table";
 import { useTheme } from "next-themes";
 
@@ -23,10 +24,10 @@ import {
   Subtitle,
   DonutChart,
   Legend as TremorLegend,
+  BarChart,
 } from "@tremor/react";
 
 import { testData, truckData, finalData } from "./api/data.js";
-import Dropdown from "@/components/Dropdown";
 import Contact from "../components/Contact";
 import { InferGetStaticPropsType } from "next";
 import { useQuery } from "@tanstack/react-query";
@@ -40,6 +41,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Colors
 );
 
@@ -223,29 +225,70 @@ export async function getStaticProps() {
       .filter((t: any) => t.transformation === "lvl")[0]
       .values.slice(-1)[0] * 1000;
 
+  const currentPopObservationDate = population.data.observations.observationEnd;
+
   const currentLaborForce =
     civilianLabor.data.observations.transformationResults
       .filter((t: any) => t.transformation === "lvl")[0]
       .values.slice(-1)[0] * 1000;
 
+  const currentLaborForceDate = civilianLabor.data.observations.observationEnd;
+  console.log(currentLaborForceDate);
+
   const unemploymentRate = unemployment.data.observations.transformationResults
     .filter((t: any) => t.transformation === "lvl")[0]
     .values.slice(-1)[0];
 
+  const unemploymentRateDate = unemployment.data.observations.observationEnd;
+  console.log(unemploymentRateDate);
+
   const laborPieChart = await jobsByIndustry();
 
   return {
-    props: { currentPop, currentLaborForce, unemploymentRate, laborPieChart },
+    props: {
+      unemploymentRateDate,
+      currentLaborForceDate,
+      currentPopObservationDate,
+      currentPop,
+      currentLaborForce,
+      unemploymentRate,
+      laborPieChart,
+    },
   };
 }
 
 export default function Home({
   currentPop,
+  currentPopObservationDate,
+  currentLaborForceDate,
+  unemploymentRateDate,
   currentLaborForce,
   unemploymentRate,
   laborPieChart,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [industry, setIndustry] = useState<keyof typeof finalData>("trucking");
+
+  // convert date of format 2021-06-01 to June 2021
+  function formatDate(observationEnd: string | number): string {
+    const date = new Date(observationEnd);
+    const month = date.getUTCMonth() + 1; // get the month and adjust it by 1
+    const year = date.getUTCFullYear(); // get the year
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return `${monthNames[month - 1]} ${year}`; // return the formatted date
+  }
 
   const { data: unemploymentData, isLoading } = useQuery({
     queryKey: ["uiData"],
@@ -276,6 +319,97 @@ export default function Home({
   const formatJobData = (number: number) =>
     `${Intl.NumberFormat("us").format(number).toString()}`;
 
+  const jobOpenings = {
+    labels: [
+      "Architecture and Engineering Occupations",
+      "Arts; Design; Entertainment; Sports; and Media Occ",
+      "Building and Grounds Cleaning and Maintenance Occu",
+      "Business and Financial Operations Occupations",
+      "Community and Social Service Occupations",
+      "Computer and Mathematical Occupations",
+      "Construction and Extraction Occupations",
+      "Educational Instruction and Library Occupations",
+      "Farming; Fishing; and Forestry Occupations",
+      "Food Preparation and Serving Related Occupations",
+      "Healthcare Practitioners and Technical Occupations",
+      "Healthcare Support Occupations",
+      "Installation; Maintenance; and Repair Occupations",
+      "Legal Occupations",
+      "Life; Physical; and Social Science Occupations",
+      "Management Occupations",
+      "Military Specific Occupations",
+      "Office and Administrative Support Occupations",
+      "Personal Care and Service Occupations",
+      "Production Occupations",
+      "Protective Service Occupations",
+      "Sales and Related Occupations",
+      "Transportation and Material Moving Occupations",
+    ],
+    datasets: [
+      {
+        label: "Kauai County",
+        data: [
+          72, 31, 90, 53, 24, 73, 25, 22, 2, 197, 299, 88, 77, 1, 19, 133, 0,
+          140, 80, 24, 51, 167, 149,
+        ],
+        backgroundColor: "#b91c1c",
+        borderColor: "rgba(255, 99, 132, 1)",
+        borderWidth: 1,
+      },
+      {
+        label: "Hawaii",
+        data: [
+          875, 449, 848, 924, 543, 928, 311, 474, 43, 2, 4, 900, 899, 112, 345,
+          2, 52, 2, 770, 485, 679, 2, 1,
+        ],
+        backgroundColor: "#1d4ed8",
+        borderColor: "rgba(54, 162, 235, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    plugins: {
+      title: {
+        display: true,
+        text: "Job Openings by Industry",
+      },
+      legend: {
+        display: true,
+        labels: {
+          color: "rgb(107 114 128)",
+        },
+      },
+    },
+    responsive: true,
+    interaction: {
+      mode: "index" as const,
+      intersect: false,
+    },
+
+    scales: {
+      x: {
+        stacked: true,
+        ticks: {
+          color: "rgb(107 114 128)",
+          font: {
+            size: 12,
+          },
+        },
+      },
+      y: {
+        stacked: true,
+        ticks: {
+          color: "rgb(107 114 128)",
+          font: {
+            size: 12,
+          },
+        },
+      },
+    },
+  };
+
   return (
     <>
       <Head>
@@ -291,10 +425,9 @@ export default function Home({
             className="container flex flex-col-reverse items-center
           px-6 mx-auto mt-10 md:flex-row"
           >
-            {/* Left Item */}
             <div className="flex flex-col space-y-12 items-center md:items-start">
               <h1 className="text-4xl dark:text-gray-100 text-gray-800 font-bold text-center md:text-5xl md:text-left">
-                Kauai County Data Dashboard
+                Kauai Workforce Data Dashboard
               </h1>
               <p className="max-w-sm text-center dark:text-gray-300 text-gray-600 md:text-left">
                 Welcome! This site displays workforce statistics for the County
@@ -304,7 +437,6 @@ export default function Home({
               </p>
               <div className="border dark:border-gray-600 border-gray-200 w-full"></div>
             </div>
-            {/* Right Item */}
           </div>
         </section>
         <section id="dashboard">
@@ -316,6 +448,8 @@ export default function Home({
               <div className="flex align-middle">
                 <a
                   href="https://dbedt.hawaii.gov/economic/datawarehouse/"
+                  target="_blank"
+                  rel="noreferrer noopener"
                   className="text-sm font-medium leading-6 text-gray-500 hover:underline hover:underline-offset-4 align-middle pr-2"
                 >
                   Source: U.S. Bureau of Labor Statistics and Hawaii State Dep.
@@ -333,6 +467,11 @@ export default function Home({
                   <dd className="mt-1 text-3xl font-semibold tracking-tight dark:text-gray-100 text-gray-800">
                     {currentPop.toLocaleString()}
                   </dd>
+                  <dd>
+                    <span className="text-xs text-gray-500">
+                      As of {formatDate(currentPopObservationDate)}
+                    </span>
+                  </dd>
                 </div>
                 <div className="overflow-hidden rounded-lg dark:bg-gray-800 bg-white  px-4 py-5 shadow sm:p-6">
                   <dt className="truncate text-sm font-medium dark:text-gray-400 text-gray-500">
@@ -340,6 +479,11 @@ export default function Home({
                   </dt>
                   <dd className="mt-1 text-3xl font-semibold tracking-tight dark:text-gray-100 text-gray-800">
                     {currentLaborForce.toLocaleString()}
+                  </dd>
+                  <dd>
+                    <span className="text-xs text-gray-500">
+                      As of {formatDate(currentLaborForceDate)}
+                    </span>
                   </dd>
                 </div>
                 <div className="overflow-hidden rounded-lg dark:bg-gray-800 bg-white px-4 py-5 shadow sm:p-6">
@@ -349,67 +493,37 @@ export default function Home({
                   <dd className="mt-1 text-3xl font-semibold tracking-tight dark:text-gray-100 text-gray-800">
                     {unemploymentRate} %
                   </dd>
+                  <dd>
+                    <span className="text-xs text-gray-500">
+                      As of {formatDate(unemploymentRateDate)}
+                    </span>
+                  </dd>
                 </div>
               </dl>
             </div>
+            <div className="mt-20 grid grid-cols-1 items-end  gap-5 ">
+              <Card>
+                <Title>Job Openings by Industry</Title>
+                <Subtitle>
+                  <a
+                    href="https://www.hirenethawaii.com/vosnet/lmi/default.aspx?plang=E&qlink=1"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="hover:underline underline-offset-1"
+                  >
+                    Hawaii Workforce Infonet, Oct. 2023
+                  </a>
+                </Subtitle>
+                <Bar options={options} data={jobOpenings} />
+              </Card>
+            </div>
+            <div className="border dark:border-gray-600 border-gray-200 mt-20 w-full"></div>
             <div className="mt-20 grid grid-cols-1 items-end  gap-5 sm:grid-cols-3">
-              <div className="sm:col-span-1 h-full">
-                <Card className="max-w-lg">
-                  <Title>Jobs by Industry</Title>
-                  <Subtitle>
-                    Source: Hawaii Workforce Informer, Hawaii Dept. of Labor and
-                    Industrial Relations
-                  </Subtitle>
-                  <DonutChart
-                    className="mt-6"
-                    variant="pie"
-                    data={laborPieChart}
-                    valueFormatter={formatJobData}
-                    category="lvlData"
-                    index="category"
-                    colors={[
-                      "slate",
-                      "violet",
-                      "indigo",
-                      "rose",
-                      "cyan",
-                      "amber",
-                      "emerald",
-                      "orange",
-                      "sky",
-                    ]}
-                  />
-                  <TremorLegend
-                    className="mt-3"
-                    categories={[
-                      "Construction",
-                      "Retail",
-                      "Transportation",
-                      "Food Services",
-                      "Accommodation",
-                      "Government",
-                      "Healthcare",
-                      "Arts and Entertainment",
-                    ]}
-                    colors={[
-                      "slate",
-                      "violet",
-                      "indigo",
-                      "rose",
-                      "cyan",
-                      "amber",
-                      "emerald",
-                      "orange",
-                      "sky",
-                    ]}
-                  />
-                </Card>
-              </div>
-              <div className="sm:col-span-2">
+              <div className="sm:col-span-3">
                 <Card>
                   <Title>Unemployment Rate (Monthly)</Title>
                   <Subtitle>
-                    Source: {unemploymentData?.data?.series?.sourceDescription}
+                    {unemploymentData?.data?.series?.sourceDescription}
                   </Subtitle>
                   {isLoading ? (
                     <>
@@ -445,7 +559,7 @@ export default function Home({
                 <Card>
                   <Title>Total Visitor Arrivals (Monthly)</Title>
                   <Subtitle>
-                    Source: {visitorArrivals?.data?.series?.sourceDescription}
+                    {visitorArrivals?.data?.series?.sourceDescription}
                   </Subtitle>
 
                   {loadingVisitorStats ? (
