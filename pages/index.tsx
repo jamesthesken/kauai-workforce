@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import NavBar from "@/components/NavBar";
+import { useTheme } from "next-themes";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -471,6 +472,9 @@ export default function Home({
     },
   };
 
+  const { theme } = useTheme();
+  console.log(theme);
+
   return (
     <>
       <Head>
@@ -687,6 +691,7 @@ export default function Home({
                                       ]
                                     }
                                   </span> */}
+
                                   <Badge
                                     text={
                                       cert[
